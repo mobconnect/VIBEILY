@@ -1,0 +1,42 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidVibe(data) {
+      return data.id is string 
+        && data.type in ['video', 'audio', 'image', 'emotion']
+        && data.createdAt is number
+        && data.senderName is string
+        && data.vaultId is string
+        && (!('url' in data) || data.url is string)
+        && (!('content' in data) || data.content is string)
+        && (!('emotion' in data) || data.emotion is string)
+        && (!('backgroundMusicUrl' in data) || data.backgroundMusicUrl is string)
+        && (!('originalVibeId' in data) || data.originalVibeId is string)
+        && (!('isRemix' in data) || data.isRemix is bool)
+        && (!('sharedWithEmails' in data) || data.sharedWithEmails is list)
+        && (!('likes' in data) || data.likes is list)
+        && (!('bookmarks' in data) || data.bookmarks is list);
+    }
+
+    match /vibes/{vibeId} {
+      allow read: if true; 
+      allow create: if isValidVibe(request.resource.data);
+      allow update: if isSignedIn() && (
+        // Anyone signed in can toggle a like or bookmark (only affecting specific arrays)
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes']) && isValidVibe(request.resource.data)) ||
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['bookmarks']) && isValidVibe(request.resource.data)) ||
+        // Owner or Admin can update anything valid
+        ((request.auth.token.email == resource.data.senderEmail || request.auth.token.email == 'jessieleighbright@gmail.com') && isValidVibe(request.resource.data))
+      );
+      allow delete: if request.auth != null && request.auth.token.email == 'jessieleighbright@gmail.com'; 
+    }
+  }
+}

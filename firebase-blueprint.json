@@ -1,0 +1,42 @@
+{
+  "entities": {
+    "VibeItem": {
+      "title": "Vibe Item",
+      "description": "A memory item in the vault (video, audio, image, emotion)",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "type": "string", "enum": ["video", "audio", "image", "emotion"] },
+        "url": { "type": "string" },
+        "content": { "type": "string" },
+        "emotion": { "type": "string" },
+        "createdAt": { "type": "number" },
+        "senderName": { "type": "string" },
+        "senderEmail": { "type": "string" },
+        "backgroundMusicUrl": { "type": "string" },
+        "originalVibeId": { "type": "string" },
+        "isRemix": { "type": "boolean" },
+        "vaultId": { "type": "string" },
+        "sharedWithEmails": { 
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "likes": { 
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "bookmarks": { 
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "required": ["id", "type", "createdAt", "senderName", "vaultId"]
+    }
+  },
+  "firestore": {
+    "/vibes/{vibeId}": {
+      "schema": "VibeItem",
+      "description": "The collection of all vibes in the vault."
+    }
+  }
+}

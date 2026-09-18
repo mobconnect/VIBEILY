@@ -1,0 +1,6 @@
+{
+  "name": "vibeily",
+  "description": "A digital scrapbook for saving and sharing your favorite videos, sounds, and emotions.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
